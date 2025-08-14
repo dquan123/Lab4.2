@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,8 +28,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.lab42.ui.theme.Lab42Theme
 
@@ -63,6 +66,18 @@ fun PantallaPrincipal(){
             .fillMaxWidth()
             .padding(16.dp)
     ){
+
+        Spacer(modifier = Modifier.height(35.dp))
+
+        Text(
+            text = "Healthy Living App",
+            fontSize = 24.sp,
+            modifier = Modifier.
+                align(Alignment.CenterHorizontally)
+        )
+
+        Spacer(modifier = Modifier.height(35.dp))
+
         TextField(
             value = nombre,
             onValueChange = {nombre = it},
@@ -70,35 +85,49 @@ fun PantallaPrincipal(){
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         TextField(
             value = imgURL,
             onValueChange = {imgURL = it},
             label = {Text("URL de la imagen: ")},
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(175.dp)
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
-                if (nombre.text.isNotBlank() && imgURL.text.isNotBlank()){
+                if (nombre.text.isNotBlank() && imgURL.text.isNotBlank() &&
+                    !recetas.any {it.nombre == nombre.text && it.imgURL == imgURL.text}){
                     recetas.add(Receta(nombre.text, imgURL.text))
                     nombre = TextFieldValue("")
                     imgURL = TextFieldValue("")
                 }
             },
-            modifier = Modifier.align(Alignment.End)
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text("Agregar")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        Text(
+            text = "Todas tus recetas:",
+            fontSize = 15.sp,
+            color = Color.Blue,
+            modifier = Modifier.
+                align(Alignment.Start)
+        )
+
         LazyColumn {
             items(recetas) { receta ->
-                RecetaCard(receta)
+                RecetaCard(
+                    receta = receta,
+                    onRemove = { recetas.remove(receta) }
+                )
             }
         }
     }
@@ -108,7 +137,7 @@ fun PantallaPrincipal(){
 
 
 @Composable
-fun RecetaCard(receta: Receta) {
+fun RecetaCard(receta: Receta, onRemove: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -131,6 +160,18 @@ fun RecetaCard(receta: Receta) {
 
             Text(text = receta.nombre)
 
+            Spacer(modifier = Modifier.weight(1f))
+
+            //Texto de la x para eliminar la receta
+            Text(
+                text = "❌",
+                fontSize = 25.sp,
+                color = Color.Red,
+                modifier = Modifier
+                    .clickable{
+                        onRemove()
+                    }
+            )
         }
     }
 }
